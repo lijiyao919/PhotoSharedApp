@@ -1,0 +1,4 @@
+*.zip
+*.pdf
+node_modules
+test/node_modules

@@ -1,0 +1,7 @@
+.cs142-user-photo-image {
+  display: block;
+  max-width: 100%;
+  width: 20%;
+  height: auto;
+  object-fit: contain;
+}

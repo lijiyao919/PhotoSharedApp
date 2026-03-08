@@ -1,0 +1,9 @@
+.cs142-topbar-appBar {
+  height: 60;
+  justify-content: "center";
+}
+
+.js-top-bar {
+  display: flex;
+  justify-content: space-between;
+}
