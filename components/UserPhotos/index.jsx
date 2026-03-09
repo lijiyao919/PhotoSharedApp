@@ -42,50 +42,48 @@ class UserPhotos extends React.Component {
     this.setState({photos:this.state.photos, count:this.state.count-1})
   }
 
-  render() {
-    if(!this.state.photos){
-      return (
-        <Typography variant="body1">Loading...</Typography>
-      );
-    }
+  renderPhotoOneByOne(){
+    return (
+      <Card sx={{mb:"15px"}}>
+        <CardHeader subheader={new Date(this.state.photos[this.state.count].date_time).toLocaleString()}/>
+        <CardMedia
+          component="img"
+          sx={{width:"20vw", height:"20vw", objectFit:"cover", ml:"10px"}}
+          image={`images/${this.state.photos[this.state.count].file_name}`}
+          alt={this.state.photos[this.state.count].file_name}
+        />
+        <Stack sx={{mb:"10px"}}>
+          {this.state.photos[this.state.count].comments && this.state.photos[this.state.count].comments.map((comment, index)=>{
+            if(comment){
+              return (
+                <Box sx={{ml:"15px"}} key={index}>  
+                  <Typography variant="body1">
+                    <Link to={`/users/${comment.user._id}`}>{comment.user.first_name} {comment.user.last_name}</Link> {": "}
+                    {comment.comment}
+                  </Typography>
+                  <Typography variant="body2">
+                    {(new Date(comment.date_time)).toLocaleString()}  
+                  </Typography>  
+                </Box>
+              );
+            }
+          })}
+          <ButtonGroup size="small" 
+              variant="text" 
+              aria-label="Basic button group"
+              sx={{ml:"600px"}}>
+            {this.state.count>0 && <Button onClick={this.handleBackwardClick}>Backward</Button>}
+            {this.state.count<this.state.photos.length-1 && <Button onClick={this.handleForwardClick}>Forward</Button>}  
+          </ButtonGroup>
+        </Stack>
+      </Card>
+    );
+  }
+
+  renderAllPhotos() {
     return (
       <>
-        {this.props.adv? 
-            <Card sx={{mb:"15px"}}>
-              <CardHeader subheader={new Date(this.state.photos[this.state.count].date_time).toLocaleString()}/>
-              <CardMedia
-                component="img"
-                sx={{width:"20vw", height:"20vw", objectFit:"cover", ml:"10px"}}
-                image={`images/${this.state.photos[this.state.count].file_name}`}
-                alt={this.state.photos[this.state.count].file_name}
-              />
-              <Stack sx={{mb:"10px"}}>
-                {this.state.photos[this.state.count].comments && this.state.photos[this.state.count].comments.map((comment, index)=>{
-                  if(comment){
-                    return (
-                      <Box sx={{ml:"15px"}} key={index}>  
-                        <Typography variant="body1">
-                          <Link to={`/users/${comment.user._id}`}>{comment.user.first_name} {comment.user.last_name}</Link> {": "}
-                          {comment.comment}
-                        </Typography>
-                        <Typography variant="body2">
-                          {(new Date(comment.date_time)).toLocaleString()}  
-                        </Typography>  
-                      </Box>
-                    );
-                  }
-                })}
-                <ButtonGroup size="small" 
-                    variant="text" 
-                    aria-label="Basic button group"
-                    sx={{ml:"600px"}}>
-                  {this.state.count>0 && <Button onClick={this.handleBackwardClick}>Backward</Button>}
-                  {this.state.count<this.state.photos.length-1 && <Button onClick={this.handleForwardClick}>Forward</Button>}  
-                </ButtonGroup>
-              </Stack>
-            </Card>
-        :
-        this.state.photos.map((photo, index)=>{
+        {this.state.photos.map((photo, index)=>{
           return (
             <Card sx={{mb:"15px"}} key={index}>
               <CardHeader subheader={new Date(photo.date_time).toLocaleString()}/>
@@ -115,6 +113,23 @@ class UserPhotos extends React.Component {
             </Card>
           );
         })}
+      </>
+    );
+  }
+
+  render() {
+    if(!this.state.photos){
+      return (
+        <Typography variant="body1">Loading...</Typography>
+      );
+    }
+    return (
+      <>
+        {this.props.adv? 
+          this.renderPhotoOneByOne()      
+        :
+          this.renderAllPhotos()
+        }
       </>   
     );
   }
