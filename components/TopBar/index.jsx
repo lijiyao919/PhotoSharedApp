@@ -6,6 +6,9 @@ import "./styles.css";
 //import fetchModel from "../../lib/fetchModelData";
 import axios from "axios";
 
+import Checkbox from '@mui/material/Checkbox';
+import FormControlLabel from "@mui/material/FormControlLabel";
+
 /**
  * Define TopBar, a React component of CS142 Project 5.
  */
@@ -29,6 +32,7 @@ class TopBar extends React.Component {
         user:null
       });
     });
+    this.handleClickCheckedBox=this.handleClickCheckedBox.bind(this);
   }
 
   componentDidMount(){
@@ -65,12 +69,22 @@ class TopBar extends React.Component {
     }
   }
 
+  handleClickCheckedBox(event) {
+    this.props.setAdv(event.target.checked);
+  }
+
   render() {
     return (
       <AppBar className="cs142-topbar-appBar" position="absolute">
         <Toolbar className="js-top-bar">
           <Typography variant="h5" color="inherit">
-            Jiyao Li
+            <span>Jiyao Li</span>
+            <FormControlLabel sx={{display:"block"}}
+              control={<Checkbox sx={{ color: "white", '&.Mui-checked': { color: "white" } }} 
+                        size="small"/>} 
+              label="Advanced Feature"
+              onChange={this.handleClickCheckedBox}
+            />
           </Typography>
           {(this.state.type && this.state.user) ?
             (<Typography variant="h5" color="inherit">

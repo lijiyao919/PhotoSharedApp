@@ -12,6 +12,13 @@ import UserPhotos from "./components/UserPhotos";
 class PhotoShare extends React.Component {
   constructor(props) {
     super(props);
+    this.state={adv:false};
+    this.setAdv = this.setAdv.bind(this);
+  }
+
+  setAdv = function (val) {
+    //console.log("val: ", val);
+    this.setState({adv:val});
   }
 
   render() {
@@ -20,7 +27,7 @@ class PhotoShare extends React.Component {
         <div>
           <Grid container spacing={2}>
             <Grid item xs={12}>
-              <TopBar />
+              <TopBar setAdv={this.setAdv}/>
             </Grid>
             <div className="cs142-main-topbar-buffer" />
             <Grid item sm={3}>
@@ -48,7 +55,7 @@ class PhotoShare extends React.Component {
                   />
                   <Route
                     path="/photos/:userId"
-                    render={(props) => <UserPhotos {...props} />}
+                    render={(props) => <UserPhotos {...props} adv={this.state.adv}/>}
                   />
                   <Route path="/users" component={UserList} />
                 </Switch>
