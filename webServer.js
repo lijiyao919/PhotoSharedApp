@@ -59,13 +59,14 @@ app.use(express.static(__dirname));
 
 app.use("/user/:id", checkId);
 app.use("/photosOfUser/:id", checkId);
+app.use("/count/photos/:id", checkId);
 
 function checkId(request, response, next){
   if(request.params.id==="list" || 
     mongoose.Types.ObjectId.isValid(request.params.id)){
     next();
   }else{
-    response.status(400).send("User ID is not valid.");
+    response.status(400).send({ "error": "Invalid user id" });
     return;
   }
 }
@@ -227,6 +228,35 @@ app.get("/photosOfUser/:id", function (request, response) {
     });
   });
   
+});
+
+app.get("/count/photos/:id", function (request, response) {
+  Photo.countDocuments({user_id: mongoose.Types.ObjectId(request.params.id)},function (err, counts){
+    if(err){
+      response.status(400).send({"err": "no exist the id."});
+      return;
+    }
+    response.status(200).send({"length": counts});
+  });
+});
+
+app.get("/count/comments/:id", function (request, response) {
+  let count = 0;
+  Photo.find({}, function (err, photos){
+    if(err){
+      response.status(500).send({"err": "Photo cleection err"});
+      return;
+    }
+    photos.forEach(photo => {
+      photo.comments.forEach(commentObj => {
+        if(commentObj.user_id.equals(mongoose.Types.ObjectId(request.params.id))){
+          count++;
+        }
+      });
+    });
+    console.log("comment: ", count);
+    response.status(200).send({"comment_count":count});
+  });
 });
 
 const server = app.listen(3000, function () {
