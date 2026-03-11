@@ -426,4 +426,116 @@ describe("CS142 Photo App: Web API Tests", function () {
       );
     });
   });
+
+  describe("test /count/photos/:id", function(done){
+    let userList;
+    const cs142Users = cs142models.userListModel();
+
+    it("can get the list of user", function (done) {
+      http.get(
+        {
+          hostname: host,
+          port: port,
+          path: "/user/list",
+        },
+        function (response) {
+          let responseBody = "";
+          response.on("data", function (chunk) {
+            responseBody += chunk;
+          });
+
+          response.on("end", function () {
+            assert.strictEqual(
+              response.statusCode,
+              200,
+              "HTTP response status code not OK"
+            );
+            userList = JSON.parse(responseBody);
+            done();
+          });
+        }
+      );
+    });
+
+    it("can get each of the user photos count with /count/photos/:id", function (done) {
+      async.each(
+        cs142Users,
+        function (cs142User, callback) {
+          const realUser = _.find(userList, 
+                            {first_name: cs142User.first_name,
+                              last_name: cs142User.last_name
+                            });
+          //console.log("real user: ", realUser);
+          const cs142Photos = cs142models.photoOfUserModel(cs142User._id);
+          //console.log("fake photos: ", cs142Photos);
+          http.get(
+            {
+              hostname: host,
+              port: port,
+              path: "/count/photos/"+realUser._id,
+            },
+            function (response) {
+              let responseBody = "";
+              response.on("data", function (chunk) {
+                responseBody += chunk;
+              });
+
+              response.on("end", function () {
+                //console.log(responseBody);
+                const resp = JSON.parse(responseBody);
+                assert.strictEqual(resp.length, cs142Photos.length);
+                callback();
+              });
+            }
+          );
+        },
+        function (err) {
+          done();
+        }
+      );
+    });
+
+    it("can return no exist the id.", function (done) {
+      http.get(
+        {
+          hostname: host,
+          port: port,
+          path: "/count/photos/aaaaaaaaaaaa",
+        },
+        function (response) {
+          let responseBody = "";
+          response.on("data", function (chunk) {
+            responseBody += chunk;
+          });
+
+          response.on("end", function () {
+            const resp = JSON.parse(responseBody);
+            assert.strictEqual(resp.length, 0);
+            done();
+          });
+        }
+      );
+    });
+
+    it("can return a 400 status on an invalid id to photosOfUser", function (done) {
+      http.get(
+        {
+          hostname: host,
+          port: port,
+          path: "/count/photos/1",
+        },
+        function (response) {
+          let responseBody = "";
+          response.on("data", function (chunk) {
+            responseBody += chunk;
+          });
+
+          response.on("end", function () {
+            assert.strictEqual(response.statusCode, 400);
+            done();
+          });
+        }
+      );
+    });
+  });
 });
