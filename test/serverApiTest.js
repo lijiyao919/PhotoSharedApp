@@ -538,4 +538,121 @@ describe("CS142 Photo App: Web API Tests", function () {
       );
     });
   });
+
+  describe("test /count/comments/:id", function(done){
+    let userList;
+    const cs142Users = cs142models.userListModel();
+
+    it("can get the list of user", function (done) {
+      http.get(
+        {
+          hostname: host,
+          port: port,
+          path: "/user/list",
+        },
+        function (response) {
+          let responseBody = "";
+          response.on("data", function (chunk) {
+            responseBody += chunk;
+          });
+
+          response.on("end", function () {
+            assert.strictEqual(
+              response.statusCode,
+              200,
+              "HTTP response status code not OK"
+            );
+            userList = JSON.parse(responseBody);
+            done();
+          });
+        }
+      );
+    });
+
+    it("can get each of the user comments count with /count/comments/:id", function (done) {
+      async.each(
+        cs142Users,
+        function (cs142User, callback) {
+          const realUser = _.find(userList, 
+                            {first_name: cs142User.first_name,
+                              last_name: cs142User.last_name
+                            });
+          //console.log(cs142models.comments);
+          let commentCount=0;
+          cs142models.comments.forEach(comment=>{
+            if(comment.user._id===cs142User._id){
+              commentCount++;
+            }
+          });
+          //console.log("cs142Model count: ", commentCount);
+          http.get(
+            {
+              hostname: host,
+              port: port,
+              path: "/count/comments/"+realUser._id,
+            },
+            function (response) {
+              let responseBody = "";
+              response.on("data", function (chunk) {
+                responseBody += chunk;
+              });
+
+              response.on("end", function () {
+                //console.log(responseBody);
+                const resp = JSON.parse(responseBody);
+                assert.strictEqual(resp.comment_count, commentCount);
+                callback();
+              });
+            }
+          );
+        },
+        function (err) {
+          done();
+        }
+      );
+    });
+
+    it("can return no exist the id.", function (done) {
+      http.get(
+        {
+          hostname: host,
+          port: port,
+          path: "/count/photos/aaaaaaaaaaaa",
+        },
+        function (response) {
+          let responseBody = "";
+          response.on("data", function (chunk) {
+            responseBody += chunk;
+          });
+
+          response.on("end", function () {
+            const resp = JSON.parse(responseBody);
+            assert.strictEqual(resp.length, 0);
+            done();
+          });
+        }
+      );
+    });
+
+    it("can return a 400 status on an invalid id to comment user", function (done) {
+      http.get(
+        {
+          hostname: host,
+          port: port,
+          path: "/count/comments/1",
+        },
+        function (response) {
+          let responseBody = "";
+          response.on("data", function (chunk) {
+            responseBody += chunk;
+          });
+
+          response.on("end", function () {
+            assert.strictEqual(response.statusCode, 400);
+            done();
+          });
+        }
+      );
+    });
+  });
 });

@@ -60,6 +60,7 @@ app.use(express.static(__dirname));
 app.use("/user/:id", checkId);
 app.use("/photosOfUser/:id", checkId);
 app.use("/count/photos/:id", checkId);
+app.use("/count/comments/:id", checkId);
 
 function checkId(request, response, next){
   if(request.params.id==="list" || 

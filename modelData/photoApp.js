@@ -381,6 +381,7 @@
     userModel: userModel,
     photoOfUserModel: photoOfUserModel,
     schemaInfo: schemaModel,
+    comments
   };
 
   if (typeof exports !== "undefined") {
