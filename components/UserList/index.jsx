@@ -7,6 +7,8 @@ import {
   ListItemAvatar,
   Avatar,
   Typography,
+  Badge,
+  Stack
 } from "@mui/material";
 import { Link } from "react-router-dom/cjs/react-router-dom.min";
 
@@ -26,10 +28,25 @@ class UserList extends React.Component {
   componentDidMount() {
     // fetchModel("/user/list").then((resp)=>{
     //   this.setState({users:JSON.parse(resp)})
-    // });
-    axios.get("/user/list").then((resp)=>{
-      //console.log("user list resp: ", resp.data);
-      this.setState({users:resp.data})
+    // }); 
+    axios.get("/user/list").then((users)=>{
+      //console.log("user list 1: ", users.data);
+      const p = [];
+      users.data.forEach(user=>{
+        const p1 = axios.get("/count/photos/"+user._id).then(resp=>{
+          user.countPhotos = resp.data.length;
+          //console.log("user: ", user);
+        });
+        const p2 = axios.get("/count/comments/"+user._id).then(resp=>{
+          user.countComments = resp.data.comment_count;
+        });
+        p.push(p1);
+        p.push(p2);
+      });
+      return Promise.all(p).then(()=>users.data);  
+    }).then(usersInfo=>{
+      console.log("user list: ", usersInfo);
+      this.setState({users:usersInfo});
     });
   }
 
@@ -37,6 +54,7 @@ class UserList extends React.Component {
     if(!this.state.users){
       return <Typography>Loading...</Typography>;
     }
+    console.log("return: ", JSON.stringify(this.state.users));
     return (
       <div> 
         <List component="nav">
@@ -44,10 +62,11 @@ class UserList extends React.Component {
             return (
               <React.Fragment key={index}>
                 <ListItem alignItems="center">
-                  <ListItemAvatar>
-                    <Avatar>{user.first_name[0]}{user.last_name[0]}</Avatar>
-                  </ListItemAvatar>
                   <ListItemText primary={<Link to={`/users/${user._id}`}>{user.first_name} {user.last_name}</Link>} />
+                  <Stack direction="row" spacing={4}>
+                    <Badge badgeContent={user.countPhotos} color="success" />
+                    <Badge badgeContent={user.countComments} color="secondary" />
+                  </Stack>
                 </ListItem>
                 <Divider />
               </React.Fragment>
