@@ -61,6 +61,7 @@ app.use("/user/:id", checkId);
 app.use("/photosOfUser/:id", checkId);
 app.use("/count/photos/:id", checkId);
 app.use("/count/comments/:id", checkId);
+app.use("/commentsOfUser/:id", checkId);
 
 function checkId(request, response, next){
   if(request.params.id==="list" || 
@@ -257,6 +258,30 @@ app.get("/count/comments/:id", function (request, response) {
     });
     console.log("comment: ", count);
     response.status(200).send({"comment_count":count});
+  });
+});
+
+app.get("/commentsOfUser/:id", function(request, response){
+  Photo.find({}, function (err, photos){
+    if(err){
+      response.status(500).send({"err": "Photos list err"});
+      console.log(err);
+      return;
+    }
+    const commentObjs = [];
+    
+    photos.forEach(photo=>{
+      photo = photo.toObject();
+      photo.comments.forEach(commentObj=>{
+        if(commentObj.user_id.toString()===request.params.id){
+          commentObj.fileName = photo.file_name;
+          commentObjs.push(commentObj);
+        }
+      });
+    });
+    //console.log(commentObjs);
+    response.status(200).send(commentObjs);
+    
   });
 });
 

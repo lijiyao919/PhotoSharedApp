@@ -655,4 +655,121 @@ describe("CS142 Photo App: Web API Tests", function () {
       );
     });
   });
+
+  describe("test /commentsOfUser/:id", function (done) {
+    let userList;
+    const cs142Users = cs142models.userListModel();
+
+    it("can get the list of user", function (done) {
+      http.get(
+        {
+          hostname: host,
+          port: port,
+          path: "/user/list",
+        },
+        function (response) {
+          let responseBody = "";
+          response.on("data", function (chunk) {
+            responseBody += chunk;
+          });
+
+          response.on("end", function () {
+            assert.strictEqual(
+              response.statusCode,
+              200,
+              "HTTP response status code not OK"
+            );
+            userList = JSON.parse(responseBody);
+            done();
+          });
+        }
+      );
+    });
+
+    it("can get each of the user comments with /commentsOfUser/:id", function (done) {
+      async.each(
+        cs142Users,
+        function (realUser, callback) {
+          // validate the the user is in the list once
+          const user = _.find(userList, {
+            first_name: realUser.first_name,
+            last_name: realUser.last_name,
+          });
+          assert(
+            user,
+            "could not find user " +
+              realUser.first_name +
+              " " +
+              realUser.last_name
+          );
+          let comments;
+          const id = user._id;
+          http.get(
+            {
+              hostname: host,
+              port: port,
+              path: "/commentsOfUser/" + id,
+            },
+            function (response) {
+              let responseBody = "";
+              response.on("data", function (chunk) {
+                responseBody += chunk;
+              });
+              response.on("error", function (err) {
+                callback(err);
+              });
+
+              response.on("end", function () {
+                assert.strictEqual(
+                  response.statusCode,
+                  200,
+                  "HTTP response status code not OK"
+                );
+                comments = JSON.parse(responseBody);
+                let real_comments_count = 0;
+                
+                cs142models.comments.forEach(comment=>{
+                  if(comment.user._id===realUser._id){
+                    real_comments_count++;
+                  }
+                });
+
+                assert.strictEqual(
+                  real_comments_count,
+                  comments.length,
+                  "wrong number of photos returned"
+                );
+                
+                callback();
+              });
+            }
+          );
+        },
+        function (err) {
+          done();
+        }
+      );
+    });
+
+    it("can return a 400 status on an invalid id to commentsOfUser", function (done) {
+      http.get(
+        {
+          hostname: host,
+          port: port,
+          path: "/commentsOfUser/1",
+        },
+        function (response) {
+          let responseBody = "";
+          response.on("data", function (chunk) {
+            responseBody += chunk;
+          });
+
+          response.on("end", function () {
+            assert.strictEqual(response.statusCode, 400);
+            done();
+          });
+        }
+      );
+    });
+  });
 });
