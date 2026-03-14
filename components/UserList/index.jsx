@@ -4,13 +4,11 @@ import {
   List,
   ListItem,
   ListItemText,
-  ListItemAvatar,
-  Avatar,
   Typography,
   Badge,
   Stack
 } from "@mui/material";
-import { Link } from "react-router-dom/cjs/react-router-dom.min";
+import { Link } from "react-router-dom";
 
 import "./styles.css";
 //import fetchModel from "../../lib/fetchModelData";
@@ -63,9 +61,11 @@ class UserList extends React.Component {
               <React.Fragment key={index}>
                 <ListItem alignItems="center">
                   <ListItemText primary={<Link to={`/users/${user._id}`}>{user.first_name} {user.last_name}</Link>} />
-                  <Stack direction="row" spacing={4}>
+                  <Stack direction="row" spacing={4} sx={{display:"flex", alignItems:"center"}}>
                     <Badge badgeContent={user.countPhotos} color="success" />
-                    <Badge badgeContent={user.countComments} color="secondary" />
+                    <Link to={`/comments/${user._id}`}>
+                      <Badge badgeContent={user.countComments} color="secondary" />
+                    </Link>
                   </Stack>
                 </ListItem>
                 <Divider />

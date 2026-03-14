@@ -8,6 +8,7 @@ import TopBar from "./components/TopBar";
 import UserDetail from "./components/UserDetail";
 import UserList from "./components/UserList";
 import UserPhotos from "./components/UserPhotos";
+import UserComments from "./components/UserComments";
 
 class PhotoShare extends React.Component {
   constructor(props) {
@@ -56,6 +57,10 @@ class PhotoShare extends React.Component {
                   <Route
                     path="/photos/:userId"
                     render={(props) => <UserPhotos {...props} adv={this.state.adv}/>}
+                  />
+                  <Route
+                    path="/comments/:userId"
+                    render={(props) => <UserComments {...props}/>}
                   />
                   <Route path="/users" component={UserList} />
                 </Switch>
