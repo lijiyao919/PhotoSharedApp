@@ -43,7 +43,6 @@ class UserList extends React.Component {
       });
       return Promise.all(p).then(()=>users.data);  
     }).then(usersInfo=>{
-      console.log("user list: ", usersInfo);
       this.setState({users:usersInfo});
     });
   }
@@ -52,7 +51,6 @@ class UserList extends React.Component {
     if(!this.state.users){
       return <Typography>Loading...</Typography>;
     }
-    console.log("return: ", JSON.stringify(this.state.users));
     return (
       <div> 
         <List component="nav">
