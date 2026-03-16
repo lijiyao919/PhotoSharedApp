@@ -52,17 +52,16 @@ class PhotoShare extends React.Component {
                   />
                   <Route
                     path="/users/:userId"
-                    render={(props) => <UserDetail {...props} />}
+                    render={(props) => <UserDetail {...props} adv={this.state.adv}/>}
                   />
                   <Route
-                    path="/photos/:userId"
+                    path="/photos/:userId/:photoId?"
                     render={(props) => <UserPhotos {...props} adv={this.state.adv}/>}
                   />
                   <Route
                     path="/comments/:userId"
                     render={(props) => <UserComments {...props}/>}
                   />
-                  <Route path="/users" component={UserList} />
                 </Switch>
               </Paper>
             </Grid>
