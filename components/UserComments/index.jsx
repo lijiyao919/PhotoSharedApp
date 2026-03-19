@@ -31,24 +31,26 @@ class UserComments extends React.Component{
       <>
         {this.state.comments.map((comment, index)=>{
           return (
-            <Card sx={{display:"flex", mb:"15px"}} key={index}>
-              <Avatar
-                src={`images/${comment.fileName}`}
-                variant="square"
-                sx={{ width: 80, height: 80,"& img": {
-                          objectFit: "cover"
-                        }
-                    }}
-              />
-              <Box sx={{ml:"15px"}} key={index}>  
-                <Typography variant="body1">
-                  {comment.comment}
-                </Typography>
-                <Typography variant="body2">
-                  {(new Date(comment.date_time)).toLocaleString()}  
-                </Typography>  
-              </Box>
-            </Card>
+            <Link to={`/photos/${comment.photoOwnerId}/${comment.photoId}`} style={{textDecoration: "none" }}>
+              <Card sx={{display:"flex", mb:"15px"}} key={index}>
+                <Avatar
+                  src={`images/${comment.fileName}`}
+                  variant="square"
+                  sx={{ width: 80, height: 80,"& img": {
+                            objectFit: "cover"
+                          }
+                      }}
+                />
+                <Box sx={{ml:"15px"}} key={index}>  
+                  <Typography variant="body1">
+                    {comment.comment}
+                  </Typography>
+                  <Typography variant="body2">
+                    {(new Date(comment.date_time)).toLocaleString()}  
+                  </Typography>  
+                </Box>
+              </Card>
+            </Link>
           );
         })}
       </>

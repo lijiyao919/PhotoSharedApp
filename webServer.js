@@ -275,6 +275,8 @@ app.get("/commentsOfUser/:id", function(request, response){
       photo.comments.forEach(commentObj=>{
         if(commentObj.user_id.toString()===request.params.id){
           commentObj.fileName = photo.file_name;
+          commentObj.photoId = photo._id;
+          commentObj.photoOwnerId = photo.user_id;
           commentObjs.push(commentObj);
         }
       });
