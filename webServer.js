@@ -30,6 +30,8 @@
  *                      Each photo should have all the Comments on the Photo
  *                      (JSON format).
  */
+const session = require("express-session");
+const multer = require("multer");
 
 const mongoose = require("mongoose");
 mongoose.Promise = require("bluebird");
@@ -56,6 +58,8 @@ mongoose.connect("mongodb://127.0.0.1/cs142project6", {
 // We have the express static module
 // (http://expressjs.com/en/starter/static-files.html) do all the work for us.
 app.use(express.static(__dirname));
+app.use(session({secret: "secretKey", resave: false, saveUninitialized: false}));
+app.use(express.json());
 
 app.use("/user/:id", checkId);
 app.use("/photosOfUser/:id", checkId);
