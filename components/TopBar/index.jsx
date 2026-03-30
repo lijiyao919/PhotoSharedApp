@@ -55,17 +55,24 @@ class TopBar extends React.Component {
   }
 
   componentDidUpdate(preProps){
+    //console.log("pre loc: ", preProps.location.pathname);
+    //console.log("after loc: ", this.props.location.pathname);
     if(preProps.location.pathname !== this.props.location.pathname){
       // fetchModel(`/user/${this.props.location.pathname.split('/')[2]}`).then((resp)=>{
       //   this.setState({type: this.props.location.pathname.split('/')[1],
       //                  ver: this.state.ver,
       //                  user: JSON.parse(resp)});
       // });
-      axios(`/user/${this.props.location.pathname.split('/')[2]}`).then((resp)=>{
-        this.setState({type: this.props.location.pathname.split('/')[1],
-                       ver: this.state.ver,
-                       user: resp.data});
-      });
+      if(this.props.isLogin){
+        axios(`/user/${this.props.location.pathname.split('/')[2]}`).then((resp)=>{
+          this.setState({type: this.props.location.pathname.split('/')[1],
+                        ver: this.state.ver,
+                        user: resp.data});
+        });
+      }
+      else{
+        this.setState({type:null, user:null});
+      }
     }
   }
 
@@ -86,7 +93,7 @@ class TopBar extends React.Component {
               onChange={this.handleClickCheckedBox}
             />
           </Typography>
-          {(this.state.type && this.state.user) ?
+          {(this.props.isLogin && this.state.type && this.state.user) ?
             (<Typography variant="h5" color="inherit">
                 {this.state.type==="photos"?"Photos of ":""} 
                 {this.state.user.first_name} {" "}

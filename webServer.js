@@ -260,7 +260,7 @@ app.get("/count/comments/:id", function (request, response) {
         }
       });
     });
-    console.log("comment: ", count);
+    //console.log("comment: ", count);
     response.status(200).send({"comment_count":count});
   });
 });
@@ -289,6 +289,52 @@ app.get("/commentsOfUser/:id", function(request, response){
     response.status(200).send(commentObjs);
     
   });
+});
+
+
+app.post("/admin/login", function(request, response){
+  if(!request.body.login_name){
+    return response.status(404).send("login name is null.");
+  }
+
+  User.find({login_name: request.body.login_name}, function(err, users){
+    if (err) {
+      return response.status(500).send(err);
+    }
+
+    if (users.length === 0) {
+      return response.status(404).send("User not found");
+    }
+
+    request.session.userId = users[0]._id;
+    console.log("user's session has been created.");
+
+    response.status(200).json({"_id":users[0]._id});
+  });
+});
+
+app.post("/admin/logout", function(request, response){
+  if(!request.session.userId){
+    response.status(400).send("the user hasn't login");
+    return;
+  }
+  request.session.destroy(function (err) {
+    if(err){
+      response.status(400).send("fail to destroy user's session");
+    }else{
+      response.status(200).send("success to destroy user's session");
+    }
+  });
+});
+
+app.get("/admin/me", function(request, response){
+  //console.log(request.headers);
+  //console.log(request.session);
+  if(!request.session.userId){
+    return response.status(200).send({"_id":null});
+  }else{
+    return response.status(200).send({"_id":request.session.userId});
+  }
 });
 
 const server = app.listen(3000, function () {
