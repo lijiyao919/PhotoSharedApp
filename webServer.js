@@ -293,7 +293,7 @@ app.get("/commentsOfUser/:id", function(request, response){
 
 
 app.post("/admin/login", function(request, response){
-  if(!request.body.login_name){
+  if(!request.body || !request.body.login_name){
     return response.status(404).send("login name is null.");
   }
 
@@ -307,6 +307,7 @@ app.post("/admin/login", function(request, response){
     }
 
     request.session.userId = users[0]._id;
+    request.session.first_name = users[0].first_name;
     console.log("user's session has been created.");
 
     response.status(200).json({"_id":users[0]._id});
@@ -329,11 +330,11 @@ app.post("/admin/logout", function(request, response){
 
 app.get("/admin/me", function(request, response){
   //console.log(request.headers);
-  //console.log(request.session);
+  console.log("session: ", request.session);
   if(!request.session.userId){
-    return response.status(200).send({"_id":null});
+    return response.status(200).send({"_id":null, "first_name":null});
   }else{
-    return response.status(200).send({"_id":request.session.userId});
+    return response.status(200).send({"_id":request.session.userId, "first_name":request.session.first_name});
   }
 });
 

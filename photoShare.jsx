@@ -16,8 +16,7 @@ import axios from "axios";
 class PhotoShare extends React.Component {
   constructor(props) {
     super(props);
-    this.state={adv:false, userIsLogin:false};
-    this.url = undefined;
+    this.state={adv:false, userIsLogin:false, userFirstName:null};
     this.setAdv = this.setAdv.bind(this);
     this.setUserIsLogin = this.setUserIsLogin.bind(this);
   }
@@ -37,9 +36,11 @@ class PhotoShare extends React.Component {
       withCredentials: true
     }).then((resp)=>{
       if(resp.data._id){
-        this.setState({userIsLogin:true});
+        console.log("User's first name: ", resp.data.first_name);
+        this.setState({userIsLogin:true, userFirstName:resp.data.first_name});
       }else{
-        this.setState({userIsLogin:false});
+        console.log("no login!");
+        this.setState({userIsLogin:false, userFirstName:null});
       }
     }).catch((err)=>{
       console.log("Error: ", err.message); 
@@ -59,14 +60,19 @@ class PhotoShare extends React.Component {
     }
   }
 
+  componentWillUnmount(){
+    console.log("I am unmount in PhotoShare comp");
+  }
+
   render() {
     //console.log("login state: ", this.state.userIsLogin);
+    //console.log("first name: ", this.state.userFirstName);
     return (
       <>
         <div>
           <Grid container spacing={2}>
             <Grid item xs={12}>
-              <TopBar setAdv={this.setAdv} isLogin={this.state.userIsLogin}/>
+              <TopBar setAdv={this.setAdv} isLogin={this.state.userIsLogin} firstName={this.state.userFirstName}/>
             </Grid>
             <div className="cs142-main-topbar-buffer" />
             {this.state.userIsLogin && (

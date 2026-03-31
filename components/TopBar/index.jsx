@@ -85,7 +85,10 @@ class TopBar extends React.Component {
       <AppBar className="cs142-topbar-appBar" position="absolute">
         <Toolbar className="js-top-bar">
           <Typography variant="h5" color="inherit">
-            <span>Jiyao Li</span>
+            {!this.props.isLogin ? 
+              <span>Please Login</span>:
+              <span>Hello {this.props.firstName}</span>
+            }
             <FormControlLabel sx={{display:"block"}}
               control={<Checkbox sx={{ color: "white", '&.Mui-checked': { color: "white" } }} 
                         size="small"/>} 
