@@ -1,5 +1,5 @@
 import React from "react";
-import { AppBar, Toolbar, Typography } from "@mui/material";
+import { AppBar, Toolbar, Typography, Button, Stack } from "@mui/material";
 import { withRouter } from "react-router-dom";
 
 import "./styles.css";
@@ -33,6 +33,7 @@ class TopBar extends React.Component {
       });
     });
     this.handleClickCheckedBox=this.handleClickCheckedBox.bind(this);
+    this.handleLogout = this.handleLogout.bind(this);
   }
 
   componentDidMount(){
@@ -52,6 +53,17 @@ class TopBar extends React.Component {
       });
       //console.log("finish mount");
     }
+  }
+
+  handleLogout(){
+    axios.post("/admin/logout").then(resp=>{
+      if(resp.status===400){
+        console.log("failt to logout");
+      }else{
+        console.log("logout successfully");
+        this.props.setLogin(false);
+      }
+    });
   }
 
   componentDidUpdate(preProps){
@@ -87,7 +99,12 @@ class TopBar extends React.Component {
           <Typography variant="h5" color="inherit">
             {!this.props.isLogin ? 
               <span>Please Login</span>:
-              <span>Hello {this.props.firstName}</span>
+              <Stack direction="row" spacing={2} alignItems="center">
+                <span>Hello {this.props.firstName}</span>
+                <Button size="small" sx={{ color: "white" }} onClick={this.handleLogout}>
+                  Logout
+                </Button>
+              </Stack>
             }
             <FormControlLabel sx={{display:"block"}}
               control={<Checkbox sx={{ color: "white", '&.Mui-checked': { color: "white" } }} 

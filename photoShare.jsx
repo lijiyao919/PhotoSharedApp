@@ -53,6 +53,7 @@ class PhotoShare extends React.Component {
       axios.get("/admin/me", {
         withCredentials: true
       }).then((resp)=>{
+        console.log("hello");
         this.props.history.push(`/users/${resp.data._id}`);
       }).catch((err)=>{
         console.log("Error: ", err.message); 
@@ -72,7 +73,7 @@ class PhotoShare extends React.Component {
         <div>
           <Grid container spacing={2}>
             <Grid item xs={12}>
-              <TopBar setAdv={this.setAdv} isLogin={this.state.userIsLogin} firstName={this.state.userFirstName}/>
+              <TopBar setAdv={this.setAdv} setLogin={this.setUserIsLogin} isLogin={this.state.userIsLogin} firstName={this.state.userFirstName}/>
             </Grid>
             <div className="cs142-main-topbar-buffer" />
             {this.state.userIsLogin && (
