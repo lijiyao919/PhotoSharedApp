@@ -96,7 +96,7 @@ app.get("/", function (request, response) {
 app.get("/test/:p1", function (request, response) {
   // Express parses the ":p1" from the URL and returns it in the request.params
   // objects.
-  console.log("/test called with param1 = ", request.params.p1);
+  //console.log("/test called with param1 = ", request.params.p1);
 
   const param = request.params.p1 || "info";
 
@@ -119,7 +119,7 @@ app.get("/test/:p1", function (request, response) {
       }
 
       // We got the object - return it in JSON format.
-      console.log("SchemaInfo", info[0]);
+      //console.log("SchemaInfo", info[0]);
       response.end(JSON.stringify(info[0]));
     });
   } else if (param === "counts") {
@@ -295,6 +295,7 @@ app.post("/commentsOfPhoto/:photo_id", function(request, response){
   const photo_id = request.params.photo_id;
   const comment = request.body.comment;
   const user_id = request.session.userId;
+  console.log("hello: ", photo_id);
   if(!user_id){
     response.status(400).send({err:"no login for post comments"});
     return;
@@ -360,7 +361,7 @@ app.post("/admin/logout", function(request, response){
 
 app.get("/admin/me", function(request, response){
   //console.log(request.headers);
-  console.log("session: ", request.session);
+  //console.log("session: ", request.session);
   if(!request.session.userId){
     return response.status(200).send({"_id":null, "first_name":null});
   }else{
