@@ -9,15 +9,24 @@ import axios from "axios";
 import Button from '@mui/material/Button';
 import ButtonGroup from '@mui/material/ButtonGroup';
 
+import TextField from '@mui/material/TextField';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogTitle from '@mui/material/DialogTitle';
+
 /**
  * Define UserPhotos, a React component of CS142 Project 5.
  */
 class UserPhotos extends React.Component {
   constructor(props) {
     super(props); 
-    this.state = {photos:null, index:0};
+    this.state = {photos:null, index:0, openCommentWin:false, commentText:'', commentPhotoId:null};
     this.handleForwardClick = this.handleForwardClick.bind(this);
     this.handleBackwardClick = this.handleBackwardClick.bind(this);
+    //this.handleOpenCommentWin = this.handleOpenCommentWin.bind(this);
+    this.handleClose = this.handleClose.bind(this);
+    //this.handleSubmit = this.handleSubmit.bind(this);
   }
 
   componentDidMount() {
@@ -37,7 +46,7 @@ class UserPhotos extends React.Component {
     });
   }
 
-  componentDidUpdate(preProps) {
+  componentDidUpdate(preProps, preState) {
     // this.setState({
     //   photos:window.cs142models.photoOfUserModel(this.props.match.params.userId),
     // })
@@ -47,7 +56,8 @@ class UserPhotos extends React.Component {
     // });
     
     if(preProps.match.params.userId!=this.props.match.params.userId || 
-       preProps.match.params.photoId!=this.props.match.params.photoId){
+       preProps.match.params.photoId!=this.props.match.params.photoId ||
+       (preState.openCommentWin===true && this.state.openCommentWin===false)){
         axios.get(`/photosOfUser/${this.props.match.params.userId}`).then((resp)=>{
           //console.log("photo resp: ", resp.data);
           this.setState({photos:resp.data, 
@@ -85,10 +95,38 @@ class UserPhotos extends React.Component {
     this.props.history.push(`/photos/${this.props.match.params.userId}/${photoId}`);
   }
 
+  handleOpenCommentWin(photo_id){
+    this.setState({openCommentWin:true, commentPhotoId:photo_id});
+  }
+
+  handleClose(){
+    this.setState({openCommentWin:false});
+  }
+
+  handleInputComment(event){
+    this.setState({commentText: event.target.value});
+  }
+
+  handleSubmit(event){
+    event.preventDefault();
+    //console.log("comment: ", this.state.commentText);
+    axios.post(`/commentsOfPhoto/${this.state.commentPhotoId}`, {comment:this.state.commentText}).then(resp=>{
+      this.setState({openCommentWin:false});
+    });  
+  }
+
   renderPhotoOneByOne(){
     return (
       <Card sx={{mb:"15px"}}>
-        <CardHeader subheader={new Date(this.state.photos[this.state.index].date_time).toLocaleString()}/>
+        <Stack direction={"row"} justifyContent="space-between">
+          <CardHeader subheader={new Date(this.state.photos[this.state.index].date_time).toLocaleString()}/>
+          <Button variant="contained" 
+                size="small" 
+                sx={{mr:"10px", mt:"10px"}} 
+                onClick={()=>this.handleOpenCommentWin(photo._id)}>
+                  Add Comment
+          </Button>
+        </Stack>
         <CardMedia
           component="img"
           sx={{width:"20vw", height:"20vw", objectFit:"cover", ml:"10px"}}
@@ -129,7 +167,15 @@ class UserPhotos extends React.Component {
         {this.state.photos.map((photo, index)=>{
           return (
             <Card sx={{mb:"15px"}} key={index}>
-              <CardHeader subheader={new Date(photo.date_time).toLocaleString()}/>
+              <Stack direction={"row"} justifyContent="space-between">
+                <CardHeader subheader={new Date(photo.date_time).toLocaleString()}/>
+                <Button variant="contained"
+                     onClick={()=>this.handleOpenCommentWin(photo._id)}
+                     size="small" 
+                     sx={{mr:"10px", mt:"10px"}}>
+                      Add Comment
+                </Button>
+              </Stack>
               <CardMedia
                 component="img"
                 sx={{width:"20vw", height:"20vw", objectFit:"cover", ml:"10px"}}
@@ -173,6 +219,29 @@ class UserPhotos extends React.Component {
         :
           this.renderAllPhotos()
         }
+        <Dialog open={this.state.openCommentWin} onClose={this.handleClose} disableRestoreFocus>
+          <DialogTitle>Let Your Voice heard</DialogTitle>
+          <DialogContent>
+            <form onSubmit={(e)=>this.handleSubmit(e)} id="subscription-form">
+              <TextField
+                id="comment"
+                name="comment"
+                multiline
+                rows={4}
+                fullWidth
+                margin="dense"
+                placeholder="Write your comment here..."
+                onChange={(e)=>this.handleInputComment(e)}
+              />
+            </form>
+          </DialogContent>
+          <DialogActions>
+            <Button type="submit" form="subscription-form">
+              Submit
+            </Button>
+            <Button onClick={this.handleClose}>Cancel</Button>
+          </DialogActions>
+        </Dialog>
       </>   
     );
   }

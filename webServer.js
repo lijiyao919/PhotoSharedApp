@@ -291,6 +291,36 @@ app.get("/commentsOfUser/:id", function(request, response){
   });
 });
 
+app.post("/commentsOfPhoto/:photo_id", function(request, response){
+  const photo_id = request.params.photo_id;
+  const comment = request.body.comment;
+  const user_id = request.session.userId;
+  if(!user_id){
+    response.status(400).send({err:"no login for post comments"});
+    return;
+  }
+  Photo.find({_id:mongoose.Types.ObjectId(photo_id)}, function(err, photos){
+    if(err){
+      response.status(400).send({err:"err in photo search"});
+      return;
+    }
+    if(photos.length===0){
+      response.status(400).send({err:"photo not found"});
+      return;
+    }
+    photos[0].comments.push({comment: comment,
+                user_id:user_id,
+                date_time:(new Date()).toISOString().replace("Z", "+00:00")
+    });
+    photos[0].save(function(err){
+      if(err){
+        return response.status(400).send({err:err.message});
+      }
+      response.status(200).send("done");
+    });
+  });
+});
+
 
 app.post("/admin/login", function(request, response){
   if(!request.body || !request.body.login_name){
