@@ -295,7 +295,6 @@ app.post("/commentsOfPhoto/:photo_id", function(request, response){
   const photo_id = request.params.photo_id;
   const comment = request.body.comment;
   const user_id = request.session.userId;
-  console.log("hello: ", photo_id);
   if(!user_id){
     response.status(400).send({err:"no login for post comments"});
     return;

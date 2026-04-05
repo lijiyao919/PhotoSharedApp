@@ -130,7 +130,7 @@ class UserPhotos extends React.Component {
         <CardMedia
           component="img"
           sx={{width:"20vw", height:"20vw", objectFit:"cover", ml:"10px"}}
-          image={`images/${this.state.photos[this.state.index].file_name}`}
+          image={`/images/${this.state.photos[this.state.index].file_name}`}
           alt={this.state.photos[this.state.index].file_name}
         />
         <Stack sx={{mb:"10px"}}>
@@ -219,7 +219,13 @@ class UserPhotos extends React.Component {
         :
           this.renderAllPhotos()
         }
-        <Dialog open={this.state.openCommentWin} onClose={this.handleClose} disableRestoreFocus>
+        <Dialog
+          open={this.state.openCommentWin}
+          onClose={this.handleClose}
+          disableRestoreFocus
+          maxWidth={false}
+          PaperProps={{ sx: { width: "1000px" } }}
+        >
           <DialogTitle>Let Your Voice heard</DialogTitle>
           <DialogContent>
             <form onSubmit={(e)=>this.handleSubmit(e)} id="subscription-form">
