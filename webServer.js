@@ -176,8 +176,7 @@ app.get("/user/list", function (request, response) {
     }
     //console.log(userList);
     response.status(200).send(userList);
-  });
-  
+  });  
 });
 
 /**
@@ -215,7 +214,7 @@ app.get("/photosOfUser/:id", function (request, response) {
   Photo.find({user_id: mongoose.Types.ObjectId(id)}, "-__v", function (err, photos){
     if (photos.length === 0) {
       console.log("Photos for user with _id:" + id + " not found.");
-      response.status(400).send("Not found");
+      response.status(200).send([]);
       return;
     }
     async.each(photos, function (photo, outCallback){
@@ -372,6 +371,24 @@ app.post("/photos/new", function(request, response){
         console.error("Error create user", err);
       });
     });
+  });
+});
+
+app.post("/user", function(request, response) {
+  if(!request.body){
+    return response.status(404).send("no login name provided.");
+  }
+  console.log(request.body);
+  User.create({first_name: request.body.first_name,
+               last_name: request.body.last_name,
+               login_name: request.body.last_name.toLowerCase(),
+               location: request.body.location,
+               description: request.body.description,
+               occupation: request.body.occupation,
+  }).then(userObj=>{
+    response.status(200).send(userObj+" has been saved into DB");
+  }).catch(err=>{
+    response.status(400).send({err: err});
   });
 });
 

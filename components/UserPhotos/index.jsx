@@ -116,6 +116,9 @@ class UserPhotos extends React.Component {
   }
 
   renderPhotoOneByOne(){
+    if(this.state.photos.length===0){
+      return <p>No photos</p>
+    }
     return (
       <Card sx={{mb:"15px"}}>
         <Stack direction={"row"} justifyContent="space-between">
@@ -162,6 +165,9 @@ class UserPhotos extends React.Component {
   }
 
   renderAllPhotos() {
+    if(this.state.photos.length===0){
+      return <p>No photos</p>
+    }
     return (
       <>
         {this.state.photos.map((photo, index)=>{

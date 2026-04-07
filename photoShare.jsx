@@ -49,7 +49,7 @@ class PhotoShare extends React.Component {
 
   componentDidUpdate(prevProps, prevState){
     if(!prevState.userIsLogin && this.state.userIsLogin){
-      console.log("In photoShare, I am updating....");
+      console.log("In photoShare, I am updating after login....");
       axios.get("/admin/me", {
         withCredentials: true
       }).then((resp)=>{

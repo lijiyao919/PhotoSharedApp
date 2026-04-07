@@ -34,7 +34,11 @@ class UserDetail extends React.Component {
       user = resp.data;
     });
     const p2 = axios.get(`/photosOfUser/${this.props.match.params.userId}`).then((resp)=>{
-      photoId = resp.data[0]._id
+      if(resp.data.length===0){
+        photoId = undefined;
+      }else{
+        photoId = resp.data[0]._id;
+      }
     });
 
     Promise.all([p1,p2]).then(()=>{
@@ -82,7 +86,7 @@ class UserDetail extends React.Component {
           </CardContent>
           <CardActions>
             <Button size="small">
-              {this.props.adv ?
+              {this.props.adv && this.state.firstPhotoId ?
                <Link to={`/photos/${this.state.user._id}/${this.state.firstPhotoId}`}>
                  {this.state.user.first_name}'s Photo Gallery
                </Link> :
