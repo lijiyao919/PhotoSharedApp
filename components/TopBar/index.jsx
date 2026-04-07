@@ -1,4 +1,4 @@
-import React from "react";
+import React, { createRef } from "react";
 import { AppBar, Toolbar, Typography, Button, Stack } from "@mui/material";
 import { withRouter } from "react-router-dom";
 
@@ -34,6 +34,7 @@ class TopBar extends React.Component {
     });
     this.handleClickCheckedBox=this.handleClickCheckedBox.bind(this);
     this.handleLogout = this.handleLogout.bind(this);
+    this.uploadInput = createRef();
   }
 
   componentDidMount(){
@@ -92,6 +93,25 @@ class TopBar extends React.Component {
     this.props.setAdv(event.target.checked);
   }
 
+  handleUploadButtonClicked = (e) => {
+    e.preventDefault();
+    //console.log("photo: ", this.uploadInput.files);
+    if (this.uploadInput.files.length > 0) {
+      // Create a DOM form and add the file to it under the name uploadedphoto
+      const domForm = new FormData();
+      domForm.append('uploadedphoto', this.uploadInput.files[0]);
+      axios.post('/photos/new', domForm)
+        .then((res) => {
+          console.log(res);
+        })
+        .catch(err => console.log(`POST ERR: ${err}`));
+    }
+  }
+
+  handleAddPhoto = ()=>{
+    this.uploadInput.click();
+  }
+
   render() {
     return (
       <AppBar className="cs142-topbar-appBar" position="absolute">
@@ -106,12 +126,32 @@ class TopBar extends React.Component {
                 </Button>
               </Stack>
             }
-            <FormControlLabel sx={{display:"block"}}
-              control={<Checkbox sx={{ color: "white", '&.Mui-checked': { color: "white" } }} 
-                        size="small"/>} 
-              label="Advanced Feature"
-              onChange={this.handleClickCheckedBox}
-            />
+            <Stack direction="row" spacing={2} alignItems="center" justifyContent="center">
+              <FormControlLabel sx={{display:"block"}}
+                control={<Checkbox sx={{ color: "white", '&.Mui-checked': { color: "white" } }} 
+                          size="small"/>} 
+                label="Advanced Feature"
+                onChange={this.handleClickCheckedBox}
+              />
+              {this.props.isLogin &&
+                <>
+                  <input 
+                    type="file" 
+                    accept="image/*" 
+                    ref={(domFileRef) => { this.uploadInput = domFileRef; }}
+                    onChange={this.handleUploadButtonClicked}
+                    style={{display: "none"}}
+                  />
+                  <Button 
+                    size="small"
+                    variant="outlined"
+                    onClick={this.handleAddPhoto}
+                    sx={{ color: "white", display:"block", paddingTop:"10px"}}>
+                      Add Photo
+                  </Button>
+                </>
+              }
+            </Stack>
           </Typography>
           {(this.props.isLogin && this.state.type && this.state.user) ?
             (<Typography variant="h5" color="inherit">

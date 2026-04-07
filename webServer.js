@@ -32,6 +32,7 @@
  */
 const session = require("express-session");
 const multer = require("multer");
+const processFormBody = multer({storage: multer.memoryStorage()}).single('uploadedphoto');
 
 const mongoose = require("mongoose");
 mongoose.Promise = require("bluebird");
@@ -40,6 +41,8 @@ const async = require("async");
 
 const express = require("express");
 const app = express();
+
+const fs = require("fs");
 
 // Load the Mongoose schema for User, Photo, and SchemaInfo
 const User = require("./schema/user.js");
@@ -317,6 +320,57 @@ app.post("/commentsOfPhoto/:photo_id", function(request, response){
         return response.status(400).send({err:err.message});
       }
       response.status(200).send("done");
+    });
+  });
+});
+
+
+app.post("/photos/new", function(request, response){
+  processFormBody(request, response, function (err) {
+    if (err || !request.file) {
+        response.status(400).send({err: "err in form body process."});
+        return;
+    }
+
+    const user_id = request.session.userId;
+    if(!user_id){
+      response.status(400).send({err:"no login for post comments"});
+      return;
+    }
+
+    // request.file has the following properties of interest:
+    //   fieldname    - Should be 'uploadedphoto' since that is what we sent
+    //   originalname - The name of the file the user uploaded
+    //   mimetype     - The mimetype of the image (e.g., 'image/jpeg',
+    //                  'image/png')
+    //   buffer       - A node Buffer containing the contents of the file
+    //   size         - The size of the file in bytes
+
+    // XXX - Do some validation here.
+
+    // We need to create the file in the directory "images" under an unique name.
+    // We make the original file name unique by adding a unique prefix with a
+    // timestamp.
+    const timestamp = new Date().valueOf();
+    const filename = 'U' +  String(timestamp) + request.file.originalname;
+
+    fs.writeFile("./images/" + filename, request.file.buffer, function (err) {
+      // XXX - Once you have the file written into your images directory under the
+      // name filename you can create the Photo object in the database
+      if(err){
+        response.status(400).send({err:"fail to write photo into disk"});
+      }
+      Photo.create({
+        file_name:filename,
+        date_time:(new Date()).toISOString().replace("Z", "+00:00"),
+        user_id:request.session.userId,
+        comments: Array(),
+        __v:0
+      }).then(function (objUser){
+        response.status(200).send(`Obj has been written into DB ${objUser}`);
+      }).catch(function (err){
+        console.error("Error create user", err);
+      });
     });
   });
 });
