@@ -112,6 +112,7 @@ class UserPhotos extends React.Component {
     //console.log("comment: ", this.state.commentText);
     axios.post(`/commentsOfPhoto/${this.state.commentPhotoId}`, {comment:this.state.commentText}).then(resp=>{
       this.setState({openCommentWin:false});
+      this.props.refreshUsers();
     });  
   }
 

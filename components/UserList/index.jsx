@@ -20,41 +20,20 @@ import axios from 'axios';
 class UserList extends React.Component {
   constructor(props) {
     super(props);
-    this.state={users:null};
   }
 
   componentDidMount() {
-    // fetchModel("/user/list").then((resp)=>{
-    //   this.setState({users:JSON.parse(resp)})
-    // }); 
-    axios.get("/user/list").then((users)=>{
-      //console.log("user list 1: ", users.data);
-      const p = [];
-      users.data.forEach(user=>{
-        const p1 = axios.get("/count/photos/"+user._id).then(resp=>{
-          user.countPhotos = resp.data.length;
-          //console.log("user: ", user);
-        });
-        const p2 = axios.get("/count/comments/"+user._id).then(resp=>{
-          user.countComments = resp.data.comment_count;
-        });
-        p.push(p1);
-        p.push(p2);
-      });
-      return Promise.all(p).then(()=>users.data);  
-    }).then(usersInfo=>{
-      this.setState({users:usersInfo});
-    });
+    this.props.refreshUsers();
   }
 
   render() {
-    if(!this.state.users){
+    if(!this.props.users){
       return <Typography>Loading...</Typography>;
     }
     return (
       <div> 
         <List component="nav">
-          {this.state.users.map((user, index) => {
+          {this.props.users.map((user, index) => {
             return (
               <React.Fragment key={index}>
                 <ListItem alignItems="center">
