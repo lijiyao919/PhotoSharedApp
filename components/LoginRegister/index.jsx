@@ -10,7 +10,8 @@ class LoginRegister extends React.Component {
     this.handleLogin = this.handleLogin.bind(this);
   }
 
-  handleLogin(){
+  handleLogin(e){
+    e.preventDefault();
     axios.post(`/admin/login`, {login_name:this.state.username}).then(
       (resp) => {
         console.log("after login: ", resp.data);
