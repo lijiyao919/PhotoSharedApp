@@ -378,10 +378,9 @@ app.post("/user", function(request, response) {
   if(!request.body){
     return response.status(404).send("no login name provided.");
   }
-  console.log(request.body);
   User.create({first_name: request.body.first_name,
                last_name: request.body.last_name,
-               login_name: request.body.last_name.toLowerCase(),
+               login_name: request.body.login_name,
                location: request.body.location,
                description: request.body.description,
                occupation: request.body.occupation,
