@@ -39,9 +39,9 @@ class UserList extends React.Component {
                 <ListItem alignItems="center">
                   <ListItemText primary={<Link to={`/users/${user._id}`}>{user.first_name} {user.last_name}</Link>} />
                   <Stack direction="row" spacing={4} sx={{display:"flex", alignItems:"center"}}>
-                    <Badge badgeContent={user.countPhotos} color="success" />
+                    <Badge badgeContent={user.countPhotos} color="success" showZero/>
                     <Link to={`/comments/${user._id}`}>
-                      <Badge badgeContent={user.countComments} color="secondary" />
+                      <Badge badgeContent={user.countComments} color="secondary" showZero/>
                     </Link>
                   </Stack>
                 </ListItem>

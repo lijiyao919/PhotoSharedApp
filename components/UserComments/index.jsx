@@ -31,8 +31,8 @@ class UserComments extends React.Component{
       <>
         {this.state.comments.map((comment, index)=>{
           return (
-            <Link to={`/photos/${comment.photoOwnerId}/${comment.photoId}`} style={{textDecoration: "none" }}>
-              <Card sx={{display:"flex", mb:"15px"}} key={index}>
+            <Link to={`/photos/${comment.photoOwnerId}/${comment.photoId}`} style={{textDecoration: "none" }} key={index}>
+              <Card sx={{display:"flex", mb:"15px"}}>
                 <Avatar
                   src={`images/${comment.fileName}`}
                   variant="square"
