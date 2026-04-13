@@ -378,16 +378,28 @@ app.post("/user", function(request, response) {
   if(!request.body){
     return response.status(404).send("no login name provided.");
   }
-  User.create({first_name: request.body.first_name,
+
+  User.find({login_name: request.body.login_name}, function(err, users){
+    if (err) {
+      return response.status(500).send(err);
+    }
+    
+    if(users.length>0){
+      return response.status(400).send({error: "Username has already been existed."});
+    }
+    
+    User.create({first_name: request.body.first_name,
                last_name: request.body.last_name,
                login_name: request.body.login_name,
+               password: request.body.password,
                location: request.body.location,
                description: request.body.description,
                occupation: request.body.occupation,
-  }).then(userObj=>{
-    response.status(200).send(userObj+" has been saved into DB");
-  }).catch(err=>{
-    response.status(400).send({err: err});
+    }).then(userObj=>{
+      return response.status(200).send(userObj+" has been saved into DB");
+    }).catch(err=>{
+      return response.status(400).send({err: err});
+    });
   });
 });
 
@@ -402,8 +414,8 @@ app.post("/admin/login", function(request, response){
       return response.status(500).send(err);
     }
 
-    if (users.length === 0) {
-      return response.status(404).send("User not found");
+    if (users.length === 0 || users[0].password != request.body.password) {
+      return response.status(401).send({error:"Invalid username or password"});
     }
 
     request.session.userId = users[0]._id;

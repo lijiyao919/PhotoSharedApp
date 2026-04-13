@@ -6,15 +6,20 @@ import "./styles.css";
 class LoginRegister extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {username:"", 
-                  regWin:false, 
-                  firstname:"",
-                  lastname:"",
-                  location:"",
-                  occupation:"",
-                  description:""
+    this.state = {username:"",
+                  passwd:"",
+                  regWin:false,
+                  username_reg:"",
+                  passwd_reg:"",
+                  confirm_reg:"",
+                  confirm_err:"",
+                  firstname_reg:"",
+                  lastname_reg:"",
+                  location_reg:"",
+                  occupation_reg:"",
+                  description_reg:"",
                 };
-    this.handleLogin = this.handleLogin.bind(this);
+    this.handleSubmitLogin = this.handleSubmitLogin.bind(this);
     this.handleOpenRegWin = this.handleOpenRegWin.bind(this);
     this.handleCloseRegWin = this.handleCloseRegWin.bind(this);
   }
@@ -24,52 +29,78 @@ class LoginRegister extends React.Component {
   }
 
   handleCloseRegWin(){
-    this.setState({regWin:false});
+    this.setState({regWin:false,
+                  username_reg:"",
+                  passwd_reg:"",
+                  confirm_reg:"",
+                  confirm_err:"",
+                  firstname_reg:"",
+                  lastname_reg:"",
+                  location_reg:"",
+                  occupation_reg:"",
+                  description_reg:"",
+                });
   }
 
-  handleLogin(e){
+  handleSubmitLogin(e){
     e.preventDefault();
-    axios.post(`/admin/login`, {login_name:this.state.username}).then(
-      (resp) => {
-        console.log("after login: ", resp.data);
-        this.props.setLogin(true);
-      }
+    axios.post(`/admin/login`, {login_name:this.state.username, 
+      password:this.state.passwd}).then(
+        (resp) => {
+          console.log("after login: ", resp.data);
+          this.props.setLogin(true);
+        }
+    ).catch(
+      err=>{console.log(err);}
     );
   }
 
-  handleInputUserName = (e)=>{
-    this.setState({username:e.target.value});
+  handleInputUserNameInReg = (e)=>{
+    this.setState({username_reg: e.target.value});
   };
 
-  handleInputFirstName = (e)=>{
-    this.setState({firstname:e.target.value});
+  handleInputPasswordInReg = (e)=>{
+    this.setState({passwd_reg: e.target.value});
+  }
+
+  handleConfirmedPasswordInReg = (e)=>{
+    this.setState({confirm_reg: e.target.value});
+  }
+
+  handleInputFirstNameInReg = (e)=>{
+    this.setState({firstname_reg: e.target.value});
   };
 
-  handleInputLastName = (e)=>{
-    this.setState({lastname:e.target.value});
+  handleInputLastNameInReg = (e)=>{
+    this.setState({lastname_reg: e.target.value});
   };
 
-  handleInputLocation = (e)=>{
-    this.setState({location:e.target.value});
+  handleInputLocationInReg = (e)=>{
+    this.setState({location_reg: e.target.value});
   };
 
-  handleInputOccupation = (e)=>{
-    this.setState({occupation:e.target.value});
+  handleInputOccupationInReg = (e)=>{
+    this.setState({occupation_reg: e.target.value});
   };
 
-  handleInputDescription = (e)=>{
-    this.setState({description:e.target.value});
+  handleInputDescriptionInReg = (e)=>{
+    this.setState({description_reg: e.target.value});
   };
 
   handleRegSubmit = (e)=>{
     e.preventDefault();
-    console.log("ln: ", this.state.lastname);
-    axios.post("/user", {first_name: this.state.firstname,
-               last_name: this.state.lastname,
-               login_name: this.state.username,
-               location: this.state.location,
-               description: this.state.description,
-               occupation: this.state.occupation,
+    if(this.state.passwd_reg !== this.state.confirm_reg){
+      console.log("passwd not equal");
+      this.setState({confirm_err:"confirmed password not match"});
+      return;
+    }
+    axios.post("/user", {first_name: this.state.firstname_reg,
+               last_name: this.state.lastname_reg,
+               login_name: this.state.username_reg,
+               password: this.state.passwd_reg,
+               location: this.state.location_reg,
+               description: this.state.description_reg,
+               occupation: this.state.occupation_reg,
     }).then(resp=>{
       console.log("after reg: ", resp.data);
       this.handleCloseRegWin();
@@ -82,13 +113,24 @@ class LoginRegister extends React.Component {
     return (
       <>
         <Stack justifyContent="center">
-          <Box component="form" onSubmit={this.handleLogin} className="js-login-container">
-            <TextField type="text"
+          <Box component="form" onSubmit={this.handleSubmitLogin} className="js-login-container">
+            <TextField
+              required 
+              type="text"
               label="Username"
               placeholder="Enter your username"
-              value={this.state.username}
+              defaultValue={this.state.username}
               onChange={(e) => {this.setState({username: e.target.value})}}
               sx={{width:"250px"}}>
+            </TextField>
+            <TextField
+              required
+              type="password"
+              label="Password"
+              placeholder="Enter your password"
+              defaultChecked={this.state.passwd}
+              onChange={(e) => {this.setState({passwd: e.target.value})}}
+              sx={{width:"250px", ml:"20px"}}>
             </TextField>
             <Button
               type="submit"
@@ -97,7 +139,7 @@ class LoginRegister extends React.Component {
               Login
             </Button>
           </Box>
-          <Button onClick={this.handleOpenRegWin}>Register</Button>
+          <Button onClick={this.handleOpenRegWin}>Register Me</Button>
         </Stack>
         <Dialog
           open={this.state.regWin}
@@ -107,50 +149,73 @@ class LoginRegister extends React.Component {
         >
           <DialogTitle>User Registration</DialogTitle>
           <DialogContent>
-            <form onSubmit={(e)=>this.handleRegSubmit(e)} id="subscription-form">
+            <Box component="form" onSubmit={(e)=>this.handleRegSubmit(e)} id="subscription-form">
               <TextField
+                required
                 label="Username"
-                defaultValue=""
                 size="small"
-                onChange={this.handleInputUserName}
+                defaultValue={this.state.username_reg}
+                onChange={this.handleInputUserNameInReg}
                 sx={{width:"300px",mt:"10px", ml:"15px"}}
               />
               <TextField
+                required
+                type="password"
+                label="Password"
+                size="small"
+                defaultValue={this.state.passwd_reg}
+                onChange={this.handleInputPasswordInReg}
+                sx={{width:"300px",mt:"10px", ml:"15px"}}
+              />
+              <TextField
+                required
+                type="password"
+                label="Confirmed Password"
+                size="small"
+                defaultValue={this.state.confirm_reg}
+                onChange={this.handleConfirmedPasswordInReg}
+                sx={{width:"300px",mt:"10px", ml:"15px"}}
+                error={Boolean(this.state.confirm_err)}
+                helperText={this.state.confirm_err}
+              />
+              <TextField
+                required
                 label="First Name"
-                defaultValue=""
                 size="small"
-                onChange={this.handleInputFirstName}
+                defaultValue={this.state.firstname_reg}
+                onChange={this.handleInputFirstNameInReg}
                 sx={{width:"300px",mt:"10px", ml:"15px"}}
               />
               <TextField
+                required
                 label="Last Name"
-                defaultValue=""
                 size="small"
-                onChange={this.handleInputLastName}
+                defaultValue={this.state.lastname_reg}
+                onChange={this.handleInputLastNameInReg}
                 sx={{width:"300px",mt:"10px", ml:"15px"}}
               />
               <TextField
                 label="Location"
-                defaultValue=""
                 size="small"
-                onChange={this.handleInputLocation}
+                defaultValue={this.state.location_reg}
+                onChange={this.handleInputLocationInReg}
                 sx={{width:"300px",mt:"10px", ml:"15px"}}
               />
               <TextField
                 label="Occupation"
-                defaultValue=""
                 size="small"
-                onChange={this.handleInputOccupation}
+                defaultValue={this.state.occupation_reg}
+                onChange={this.handleInputOccupationInReg}
                 sx={{width:"300px",mt:"10px", ml:"15px"}}
               />
               <TextField
                 label="Description"
-                defaultValue=""
                 size="small"
-                onChange={this.handleInputDescription}
+                defaultValue={this.state.description_reg}
+                onChange={this.handleInputDescriptionInReg}
                 sx={{width:"300px",mt:"10px", ml:"15px"}}
               />
-            </form>
+            </Box>
           </DialogContent>
           <DialogActions>
             <Button type="submit" form="subscription-form">
