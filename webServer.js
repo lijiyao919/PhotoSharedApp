@@ -44,6 +44,9 @@ const app = express();
 
 const fs = require("fs");
 
+//make cryto
+const { makePasswordEntry, doesPasswordMatch } = require('./lib/cs142password.js');
+
 // Load the Mongoose schema for User, Photo, and SchemaInfo
 const User = require("./schema/user.js");
 const Photo = require("./schema/photo.js");
@@ -51,7 +54,7 @@ const SchemaInfo = require("./schema/schemaInfo.js");
 
 // XXX - Your submission should work without this line. Comment out or delete
 // this line for tests and before submission!
-const cs142models = require("./modelData/photoApp.js").cs142models;
+//const cs142models = require("./modelData/photoApp.js").cs142models;
 mongoose.set("strictQuery", false);
 mongoose.connect("mongodb://127.0.0.1/cs142project6", {
   useNewUrlParser: true,
@@ -387,11 +390,14 @@ app.post("/user", function(request, response) {
     if(users.length>0){
       return response.status(400).send({error: "Username has already been existed."});
     }
-    
+
+    const {salt, hash} = makePasswordEntry(request.body.password);
+
     User.create({first_name: request.body.first_name,
                last_name: request.body.last_name,
                login_name: request.body.login_name,
-               password: request.body.password,
+               password: hash,
+               salt:salt,
                location: request.body.location,
                description: request.body.description,
                occupation: request.body.occupation,
@@ -414,8 +420,12 @@ app.post("/admin/login", function(request, response){
       return response.status(500).send(err);
     }
 
-    if (users.length === 0 || users[0].password != request.body.password) {
-      return response.status(401).send({error:"Invalid username or password"});
+    if (users.length === 0){
+      return response.status(401).send({error:"Invalid username"});
+    }
+
+    if (!doesPasswordMatch(users[0].password, users[0].salt, request.body.password)) {
+      return response.status(401).send({error:"Invalid password"});
     }
 
     request.session.userId = users[0]._id;

@@ -9,7 +9,7 @@ describe("CS142 Photo App: Password API Tests", function () {
 
   describe("test makePasswordEntry", function (done) {
     it("can get the function from the module by require", function (done) {
-      cs142password = require("../cs142password");
+      cs142password = require("../lib/cs142password");
       assert(cs142password);
       assert.strictEqual(typeof cs142password.makePasswordEntry, "function");
       done();
@@ -43,7 +43,7 @@ describe("CS142 Photo App: Password API Tests", function () {
     let cs142password;
 
     it("can get the function from the module by require", function (done) {
-      cs142password = require("../cs142password");
+      cs142password = require("../lib/cs142password");
       assert(cs142password);
       assert.strictEqual(typeof cs142password.doesPasswordMatch, "function");
       done();
