@@ -78,7 +78,7 @@ function checkId(request, response, next){
     mongoose.Types.ObjectId.isValid(request.params.id)){
     next();
   }else{
-    response.status(400).send({ "error": "Invalid user id" });
+    response.status(401).send({ "error": "Invalid user id" });
     return;
   }
 }
@@ -169,6 +169,9 @@ app.get("/test/:p1", function (request, response) {
  * URL /user/list - Returns all the User objects.
  */
 app.get("/user/list", function (request, response) {
+  if(!request.session.userId){
+    return response.status(401).send("User not login");
+  }
   User.find({}, '_id first_name last_name', (err, userList)=>{
     if (err) {
         // Query returned an error. We pass it back to the browser with an
@@ -186,6 +189,10 @@ app.get("/user/list", function (request, response) {
  * URL /user/:id - Returns the information for User (id).
  */
 app.get("/user/:id", function (request, response) {
+  if(!request.session.userId){
+    return response.status(401).send("User not login");
+  }
+
   const id = request.params.id;
   //const user = cs142models.userModel(id);
   User.find({_id: mongoose.Types.ObjectId(id)}, "-__v", function (err,user){
@@ -196,8 +203,8 @@ app.get("/user/:id", function (request, response) {
       return;
     }
     if (user.length === 0) {
-      console.log("User with _id:" + id + " not found.");
-      response.status(400).send("Not found");
+      //console.log("User with _id:" + id + " not found.");
+      response.status(400).send({error:"Not found"});
       return;
     }
     response.status(200).send(user[0]);
@@ -402,7 +409,7 @@ app.post("/user", function(request, response) {
                description: request.body.description,
                occupation: request.body.occupation,
     }).then(userObj=>{
-      return response.status(200).send(userObj+" has been saved into DB");
+      return response.status(200).send(userObj);
     }).catch(err=>{
       return response.status(400).send({err: err});
     });
@@ -421,11 +428,11 @@ app.post("/admin/login", function(request, response){
     }
 
     if (users.length === 0){
-      return response.status(401).send({error:"Invalid username"});
+      return response.status(400).send({error:"Invalid username"});
     }
 
     if (!doesPasswordMatch(users[0].password, users[0].salt, request.body.password)) {
-      return response.status(401).send({error:"Invalid password"});
+      return response.status(400).send({error:"Invalid password"});
     }
 
     request.session.userId = users[0]._id;
