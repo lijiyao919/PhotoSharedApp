@@ -66,7 +66,7 @@ mongoose.connect("mongodb://127.0.0.1/cs142project6", {
 app.use(express.static(__dirname));
 app.use(session({secret: "secretKey", resave: false, saveUninitialized: false}));
 app.use(express.json());
-
+app.use(checkLogin);
 app.use("/user/:id", checkId);
 app.use("/photosOfUser/:id", checkId);
 app.use("/count/photos/:id", checkId);
@@ -81,6 +81,18 @@ function checkId(request, response, next){
     response.status(401).send({ "error": "Invalid user id" });
     return;
   }
+}
+
+function checkLogin(request, response, next) {
+  if (request.path === '/admin/login' || request.path === '/user') {
+    return next();
+  }
+
+  if (!request.session.userId) {
+    return response.status(401).send({"_id":null, "first_name":null});
+  }
+
+  next();
 }
 
 app.get("/", function (request, response) {
@@ -169,9 +181,6 @@ app.get("/test/:p1", function (request, response) {
  * URL /user/list - Returns all the User objects.
  */
 app.get("/user/list", function (request, response) {
-  if(!request.session.userId){
-    return response.status(401).send("User not login");
-  }
   User.find({}, '_id first_name last_name', (err, userList)=>{
     if (err) {
         // Query returned an error. We pass it back to the browser with an

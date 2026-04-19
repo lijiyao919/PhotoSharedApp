@@ -556,6 +556,7 @@ describe("CS142 Photo App: Server API Tests", function () {
           hostname: host,
           port: port,
           path: "/count/photos/aaaaaaaaaaaa",
+          headers: { Cookie: authCookie },
         },
         function (response) {
           let responseBody = "";
@@ -578,6 +579,7 @@ describe("CS142 Photo App: Server API Tests", function () {
           hostname: host,
           port: port,
           path: "/count/photos/1",
+          headers: { Cookie: authCookie },
         },
         function (response) {
           let responseBody = "";
@@ -675,6 +677,7 @@ describe("CS142 Photo App: Server API Tests", function () {
           hostname: host,
           port: port,
           path: "/count/photos/aaaaaaaaaaaa",
+          headers: { Cookie: authCookie },
         },
         function (response) {
           let responseBody = "";
