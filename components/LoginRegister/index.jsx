@@ -1,4 +1,6 @@
-import { TextField, Box, Button, Stack, Dialog, DialogTitle, DialogContent, DialogActions } from "@mui/material";
+import { TextField, Box, Button, Stack, Dialog, DialogTitle, DialogContent, DialogActions, InputAdornment, IconButton } from "@mui/material";
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import React from "react";
 import axios from "axios";
 import "./styles.css";
@@ -39,6 +41,7 @@ class LoginRegister extends React.Component {
                   location_reg:"",
                   occupation_reg:"",
                   description_reg:"",
+                  showPassword:false,
                 });
   }
 
@@ -109,6 +112,10 @@ class LoginRegister extends React.Component {
     });
   };
 
+  handleClickShowPassword = (e)=>{
+    this.setState({showPassword: !this.state.showPassword})
+  };
+
   render(){
     return (
       <>
@@ -125,12 +132,23 @@ class LoginRegister extends React.Component {
             </TextField>
             <TextField
               required
-              type="password"
+              type={this.state.showPassword? "text": "password"}
               label="Password"
               placeholder="Enter your password"
               defaultChecked={this.state.passwd}
               onChange={(e) => {this.setState({passwd: e.target.value})}}
-              sx={{width:"250px", ml:"20px"}}>
+              sx={{width:"250px", ml:"20px"}}
+              InputProps={{
+                endAdornment: <InputAdornment position='end'>
+                  <IconButton
+                    aria-label={this.showPassword ? 'hide the password' : 'display the password'}
+                    onClick={this.handleClickShowPassword}
+                    edge="end"
+                  >
+                    {this.state.showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
+                  </IconButton>
+                </InputAdornment>
+              }}>
             </TextField>
             <Button
               type="submit"
