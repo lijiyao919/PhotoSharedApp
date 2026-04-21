@@ -84,7 +84,10 @@ function checkId(request, response, next){
 }
 
 function checkLogin(request, response, next) {
-  if (request.path === '/admin/login' || request.path === '/user') {
+  if (request.path === '/admin/login' || 
+      request.path === '/user' ||
+      request.path.startsWith('/test/info') ||
+      request.path === '/admin/me') {
     return next();
   }
 
