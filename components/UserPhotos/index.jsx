@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { Box, Typography, Card, CardHeader, CardMedia, Stack } from "@mui/material";
+import { Box, Typography, Card, CardHeader, CardMedia, Stack, IconButton, Badge } from "@mui/material";
 
 import "./styles.css";
 //import fetchModel from "../../lib/fetchModelData";
@@ -14,6 +14,7 @@ import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
+import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 
 /**
  * Define UserPhotos, a React component of CS142 Project 5.
@@ -21,7 +22,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 class UserPhotos extends React.Component {
   constructor(props) {
     super(props); 
-    this.state = {photos:null, index:0, openCommentWin:false, commentText:'', commentPhotoId:null};
+    this.state = {photos:null, index:0, openCommentWin:false, commentText:'', commentPhotoId:null, forceUpdate:false};
     this.handleForwardClick = this.handleForwardClick.bind(this);
     this.handleBackwardClick = this.handleBackwardClick.bind(this);
     //this.handleOpenCommentWin = this.handleOpenCommentWin.bind(this);
@@ -39,6 +40,7 @@ class UserPhotos extends React.Component {
     // });
     axios.get(`/photosOfUser/${this.props.match.params.userId}`).then((resp)=>{
       //console.log("photo resp: ", resp.data);
+      resp.data.sort((a,b)=>b.likes.length-a.likes.length||new Date(b.date_time) - new Date(a.date_time));
       this.setState({photos:resp.data, 
                      index:resp.data.findIndex(
                        photo=>photo._id===this.props.match.params.photoId
@@ -116,6 +118,24 @@ class UserPhotos extends React.Component {
     });  
   }
 
+  handleClickLike = (photo_id)=>{
+    const user_id = this.props.match.params.userId;
+    axios.post(`/likesOfPhoto/${photo_id}`, {}).then(
+      resp => {
+        axios.get(`/photosOfUser/${user_id}`).then((resp)=>{
+          //console.log("photo resp: ", resp.data);
+          resp.data.sort((a,b)=>b.likes.length-a.likes.length||new Date(b.date_time) - new Date(a.date_time));
+          this.setState({photos:resp.data, 
+                        index:resp.data.findIndex(
+                          photo=>photo._id===this.props.match.params.photoId
+                        )});
+        });
+      }
+    ).catch(
+      err => console.log(err)
+    );
+  };
+
   renderPhotoOneByOne(){
     if(this.state.photos.length===0){
       return <p>No photos</p>
@@ -137,6 +157,11 @@ class UserPhotos extends React.Component {
           image={`/images/${this.state.photos[this.state.index].file_name}`}
           alt={this.state.photos[this.state.index].file_name}
         />
+        <IconButton sx={{ml:"10px"}} onClick={()=>this.handleClickLike(this.state.photos[this.state.index]._id)}>
+          <Badge badgeContent={this.state.photos[this.state.index].likes.length}>
+            <ThumbUpIcon sx={{ color: 'blue' }}/>
+          </Badge>
+        </IconButton>
         <Stack sx={{mb:"10px"}}>
           {this.state.photos[this.state.index].comments && this.state.photos[this.state.index].comments.map((comment, index)=>{
             if(comment){
@@ -189,6 +214,11 @@ class UserPhotos extends React.Component {
                 image={`images/${photo.file_name}`}
                 alt={photo.file_name}
               />
+              <IconButton sx={{ml:"10px"}} onClick={()=>this.handleClickLike(photo._id)}>
+                <Badge badgeContent={photo.likes.length}>
+                  <ThumbUpIcon sx={{ color: 'blue' }}/>
+                </Badge>
+              </IconButton>
               <Stack sx={{mb:"10px"}}>
                 {photo.comments && photo.comments.map((comment, index)=>{
                   if(comment){

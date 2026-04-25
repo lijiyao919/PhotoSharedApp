@@ -30,7 +30,7 @@ const userDetailProperties = [
   "salt"
 ];
 // Valid properties of the photo model
-const photoProperties = ["file_name", "date_time", "user_id", "_id", "comments"];
+const photoProperties = ["file_name", "date_time", "user_id", "_id", "comments", "likes"];
 // Valid comments properties
 const commentProperties = ["comment", "date_time", "_id", "user"];
 

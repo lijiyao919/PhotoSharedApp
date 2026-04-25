@@ -346,6 +346,38 @@ app.post("/commentsOfPhoto/:photo_id", function(request, response){
 });
 
 
+app.post("/likesOfPhoto/:photo_id", function(request, response){
+  const photo_id = request.params.photo_id;
+  const user_id = request.session.userId;
+
+  Photo.findOne({_id: mongoose.Types.ObjectId(photo_id)}, function(err, photo){
+    if(err){
+      response.status(400).send({err:"err in photo search"});
+      return;
+    }
+    if(!photo){
+      response.status(400).send({err:"photo not found"});
+      return;
+    }
+
+    if(photo.likes.includes(mongoose.Types.ObjectId(user_id))){
+      photo.likes = photo.likes.filter(id=>id.toString()!==user_id)
+    }else{
+      photo.likes.push(mongoose.Types.ObjectId(user_id));
+    }
+    console.log("user id: ", user_id);
+    console.log("likes: ", photo.likes);
+    photo.save(function(err){
+      if(err){
+        return response.status(400).send({err:err.message});
+      }
+      response.status(200).send("done");
+    });
+
+  });
+});
+
+
 app.post("/photos/new", function(request, response){
   processFormBody(request, response, function (err) {
     if (err || !request.file) {
@@ -386,6 +418,7 @@ app.post("/photos/new", function(request, response){
         date_time:(new Date()).toISOString().replace("Z", "+00:00"),
         user_id:request.session.userId,
         comments: Array(),
+        likes:[],
         __v:0
       }).then(function (objUser){
         response.status(200).send(`Obj has been written into DB ${objUser}`);

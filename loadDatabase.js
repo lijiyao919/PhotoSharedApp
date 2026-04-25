@@ -94,6 +94,7 @@ Promise.all(removePromises)
           file_name: photo.file_name,
           date_time: photo.date_time,
           user_id: mapFakeId2RealId[photo.user_id],
+          likes: [],
         })
           .then(function (photoObj) {
             photo.objectID = photoObj._id;
@@ -119,7 +120,9 @@ Promise.all(removePromises)
               "Adding photo:",
               photo.file_name,
               " of user ID ",
-              photoObj.user_id
+              photoObj.user_id,
+              " with likes",
+              photoObj.likes
             );
           })
           .catch(function (err) {
