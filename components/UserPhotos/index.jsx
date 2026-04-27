@@ -159,7 +159,7 @@ class UserPhotos extends React.Component {
         />
         <IconButton sx={{ml:"10px"}} onClick={()=>this.handleClickLike(this.state.photos[this.state.index]._id)}>
           <Badge badgeContent={this.state.photos[this.state.index].likes.length}>
-            <ThumbUpIcon sx={{ color: 'blue' }}/>
+            {this.state.photos[this.state.index].hasLike? <ThumbUpIcon sx={{ color: 'blue' }}/> : <ThumbUpIcon />}
           </Badge>
         </IconButton>
         <Stack sx={{mb:"10px"}}>
@@ -216,7 +216,7 @@ class UserPhotos extends React.Component {
               />
               <IconButton sx={{ml:"10px"}} onClick={()=>this.handleClickLike(photo._id)}>
                 <Badge badgeContent={photo.likes.length}>
-                  <ThumbUpIcon sx={{ color: 'blue' }}/>
+                  {photo.hasLike? <ThumbUpIcon sx={{ color: 'blue' }}/> : <ThumbUpIcon />}
                 </Badge>
               </IconButton>
               <Stack sx={{mb:"10px"}}>

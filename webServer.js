@@ -253,6 +253,11 @@ app.get("/photosOfUser/:id", function (request, response) {
         //console.log("inner: ", photo.comments);
         outCallback(err); 
       });
+      if(photo.likes.map(id => id.toString()).includes(request.session.userId)){
+        photo.hasLike=true
+      }else{
+        photo.hasLike=false;
+      }
     }, function(err) {
       response.status(200).send(newPhotos);
     });
