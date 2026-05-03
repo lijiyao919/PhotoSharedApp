@@ -254,9 +254,14 @@ app.get("/photosOfUser/:id", function (request, response) {
         outCallback(err); 
       });
       if(photo.likes.map(id => id.toString()).includes(request.session.userId)){
-        photo.hasLike=true
+        photo.hasLike=true;
       }else{
         photo.hasLike=false;
+      }
+      if(photo.favors.map(id => id.toString()).includes(request.session.userId)){
+        photo.hasFavor=true;
+      }else{
+        photo.hasFavor=false;
       }
     }, function(err) {
       response.status(200).send(newPhotos);
@@ -370,14 +375,100 @@ app.post("/likesOfPhoto/:photo_id", function(request, response){
     }else{
       photo.likes.push(mongoose.Types.ObjectId(user_id));
     }
-    console.log("user id: ", user_id);
-    console.log("likes: ", photo.likes);
+    //console.log("user id: ", user_id);
+    //console.log("likes: ", photo.likes);
     photo.save(function(err){
       if(err){
         return response.status(400).send({err:err.message});
       }
       response.status(200).send("done");
     });
+
+  });
+});
+
+
+app.post("/favorsOfPhoto/:photo_id", function(request, response){
+  const photo_id = request.params.photo_id;
+  const user_id = request.session.userId;
+
+  Photo.findOne({_id: mongoose.Types.ObjectId(photo_id)}, function(err, photo){
+    if(err){
+      response.status(400).send({err:"err in photo search"});
+      return;
+    }
+    if(!photo){
+      response.status(400).send({err:"photo not found"});
+      return;
+    }
+
+    if(photo.favors.includes(mongoose.Types.ObjectId(user_id))){
+      photo.favors = photo.favors.filter(id=>id.toString()!==user_id)
+    }else{
+      photo.favors.push(mongoose.Types.ObjectId(user_id));
+    }
+    //console.log("user id: ", user_id);
+    //console.log("likes: ", photo.likes);
+    photo.save(function(err){
+      if(err){
+        return response.status(400).send({err:err.message});
+      }
+      response.status(200).send("done");
+    });
+
+  });
+});
+
+
+app.delete("/favorsOfPhoto/:photo_id", function(request, response){
+  const photo_id = request.params.photo_id;
+  const user_id = request.session.userId;
+
+  Photo.findOne({_id: mongoose.Types.ObjectId(photo_id)}, function(err, photo){
+    if(err){
+      response.status(400).send({err:"err in photo search"});
+      return;
+    }
+    if(!photo){
+      response.status(400).send({err:"photo not found"});
+      return;
+    }
+
+    photo.favors = photo.favors.filter(id=>id.toString()!==user_id)
+    
+    //console.log("user id: ", user_id);
+    //console.log("likes: ", photo.likes);
+    photo.save(function(err){
+      if(err){
+        return response.status(400).send({err:err.message});
+      }
+      response.status(200).send("done");
+    });
+
+  });
+});
+
+
+app.get("/favorsList", function(request, response){
+  const user_id = request.session.userId;
+
+  Photo.find({}, "_id file_name date_time favors", function(err, photos){
+    if(err){
+      response.status(400).send({err:"err in loading photo"});
+      return;
+    }
+    if(photos.length===0){
+      response.status(400).send({err:"no photo in DB"});
+      return;
+    }
+
+    console.log(photos);
+    console.log(user_id);
+    const filteredPhotos = photos.filter(photo=>photo.favors.includes(mongoose.Types.ObjectId(user_id)));
+
+    console.log(filteredPhotos);
+
+    response.status(200).send(filteredPhotos);
 
   });
 });

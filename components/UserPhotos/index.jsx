@@ -15,6 +15,7 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import ThumbUpIcon from '@mui/icons-material/ThumbUp';
+import FavoriteIcon from '@mui/icons-material/Favorite';
 
 /**
  * Define UserPhotos, a React component of CS142 Project 5.
@@ -118,6 +119,24 @@ class UserPhotos extends React.Component {
     });  
   }
 
+  handleClickFavor = (photo_id)=>{
+    const user_id = this.props.match.params.userId;
+    axios.post(`/favorsOfPhoto/${photo_id}`, {}).then(
+      resp => {
+        axios.get(`/photosOfUser/${user_id}`).then((resp)=>{
+          //console.log("photo resp: ", resp.data);
+          resp.data.sort((a,b)=>b.likes.length-a.likes.length||new Date(b.date_time) - new Date(a.date_time));
+          this.setState({photos:resp.data, 
+                        index:resp.data.findIndex(
+                          photo=>photo._id===this.props.match.params.photoId
+                        )});
+        });
+      }
+    ).catch(
+      err => console.log(err)
+    );
+  };
+
   handleClickLike = (photo_id)=>{
     const user_id = this.props.match.params.userId;
     axios.post(`/likesOfPhoto/${photo_id}`, {}).then(
@@ -157,11 +176,16 @@ class UserPhotos extends React.Component {
           image={`/images/${this.state.photos[this.state.index].file_name}`}
           alt={this.state.photos[this.state.index].file_name}
         />
-        <IconButton sx={{ml:"10px"}} onClick={()=>this.handleClickLike(this.state.photos[this.state.index]._id)}>
-          <Badge badgeContent={this.state.photos[this.state.index].likes.length}>
-            {this.state.photos[this.state.index].hasLike? <ThumbUpIcon sx={{ color: 'blue' }}/> : <ThumbUpIcon />}
-          </Badge>
-        </IconButton>
+        <Stack direction="row">
+          <IconButton sx={{ml:"10px"}} onClick={()=>this.handleClickLike(this.state.photos[this.state.index]._id)}>
+            <Badge badgeContent={this.state.photos[this.state.index].likes.length}>
+              {this.state.photos[this.state.index].hasLike? <ThumbUpIcon sx={{ color: 'blue' }}/> : <ThumbUpIcon />}
+            </Badge>
+          </IconButton>
+          <IconButton sx={{ml:"10px"}} onClick={()=>this.handleClickFavor(this.state.photos[this.state.index]._id)}>  
+            {this.state.photos[this.state.index].hasFavor? <FavoriteIcon sx={{ color: 'red' }}/> : <FavoriteIcon />}
+          </IconButton>
+        </Stack>
         <Stack sx={{mb:"10px"}}>
           {this.state.photos[this.state.index].comments && this.state.photos[this.state.index].comments.map((comment, index)=>{
             if(comment){
@@ -214,11 +238,16 @@ class UserPhotos extends React.Component {
                 image={`images/${photo.file_name}`}
                 alt={photo.file_name}
               />
-              <IconButton sx={{ml:"10px"}} onClick={()=>this.handleClickLike(photo._id)}>
-                <Badge badgeContent={photo.likes.length}>
-                  {photo.hasLike? <ThumbUpIcon sx={{ color: 'blue' }}/> : <ThumbUpIcon />}
-                </Badge>
-              </IconButton>
+              <Stack direction="row">
+                <IconButton sx={{ml:"10px"}} onClick={()=>this.handleClickLike(photo._id)}>
+                  <Badge badgeContent={photo.likes.length}>
+                    {photo.hasLike? <ThumbUpIcon sx={{ color: 'blue' }}/> : <ThumbUpIcon />}
+                  </Badge>
+                </IconButton>
+                <IconButton sx={{ml:"10px"}} onClick={()=>this.handleClickFavor(photo._id)}>  
+                  {photo.hasFavor? <FavoriteIcon sx={{ color: 'red' }}/> : <FavoriteIcon />}
+                </IconButton>
+              </Stack>
               <Stack sx={{mb:"10px"}}>
                 {photo.comments && photo.comments.map((comment, index)=>{
                   if(comment){

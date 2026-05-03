@@ -11,6 +11,7 @@ import UserList from "./components/UserList";
 import UserPhotos from "./components/UserPhotos";
 import UserComments from "./components/UserComments";
 import LoginRegister from "./components/LoginRegister";
+import FavorsList from "./components/FavorsList";
 import axios from "axios";
 
 class PhotoShare extends React.Component {
@@ -145,6 +146,13 @@ class PhotoShare extends React.Component {
                       render={(props) => <UserComments {...props}/>}
                     />:
                     <Redirect path="/comments/:userId" to="/login-register" />
+                  }
+                  {this.state.userIsLogin?
+                    <Route
+                      path="/favorites/:userId"
+                      render={(props) => <FavorsList {...props}/>}
+                    />:
+                    <Redirect path="/favorites/:userId" to="/login-register" />
                   }
                 </Switch>
               </Paper>

@@ -28,6 +28,8 @@ const photoSchema = new mongoose.Schema({
   comments: [commentSchema],
   // like stat
   likes: [mongoose.Schema.Types.ObjectId],
+  // favor stat
+  favors: [mongoose.Schema.Types.ObjectId],
 });
 
 /**

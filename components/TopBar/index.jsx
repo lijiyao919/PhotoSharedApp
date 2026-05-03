@@ -1,5 +1,5 @@
 import React, { createRef } from "react";
-import { AppBar, Toolbar, Typography, Button, Stack } from "@mui/material";
+import { AppBar, Toolbar, Typography, Button, Stack, Box } from "@mui/material";
 import { withRouter } from "react-router-dom";
 
 import "./styles.css";
@@ -8,6 +8,8 @@ import axios from "axios";
 
 import Checkbox from '@mui/material/Checkbox';
 import FormControlLabel from "@mui/material/FormControlLabel";
+import { Link } from "react-router-dom";
+import { fontSize } from "@mui/system";
 
 /**
  * Define TopBar, a React component of CS142 Project 5.
@@ -128,12 +130,13 @@ class TopBar extends React.Component {
               </Stack>
             }
             <Stack direction="row" spacing={2} alignItems="center" justifyContent="center">
-              <FormControlLabel sx={{display:"block"}}
-                control={<Checkbox sx={{ color: "white", '&.Mui-checked': { color: "white" } }} 
-                          size="small"/>} 
-                label="Advanced Feature"
-                onChange={this.handleClickCheckedBox}
-              />
+              {this.props.isLogin && 
+                <FormControlLabel sx={{display:"block"}}
+                  control={<Checkbox sx={{ color: "white", '&.Mui-checked': { color: "white" } }} 
+                            size="small"/>} 
+                  label="Advanced Feature"
+                  onChange={this.handleClickCheckedBox}
+                />}
               {this.props.isLogin &&
                 <>
                   <input 
@@ -151,6 +154,16 @@ class TopBar extends React.Component {
                       Add Photo
                   </Button>
                 </>
+              }
+              {(this.props.isLogin && this.state.user) &&
+                  <Link style={{
+                          color: "white",
+                          textDecoration: "none",
+                          fontSize: "15px",
+                        }}
+                    to={`/favorites/${this.state.user._id}`}>
+                    My Favorites
+                  </Link>
               }
             </Stack>
           </Typography>
